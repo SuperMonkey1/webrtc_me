@@ -7,3 +7,7 @@ pip install -r requirements.txt
 git add .
 git commit -m 'Add new feature X'
 git push
+
+# setting up app:
+npm install express socket.io
+node server.js

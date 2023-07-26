@@ -10,4 +10,4 @@ git push
 
 # setting up app:
 npm install express socket.io
-node server.js
+node signaling_server.js

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Data Connection Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <video id="local-video" autoplay></video>
+    <video id="remote-video" autoplay></video>
+    <button id="start">Start</button>
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="Enter your message here..." />
+        <button type="submit">Send</button>
+    </form>
+    <div id="messages"></div>
+
+    <script>
+        let socket = io.connect('http://localhost:3000');
+        let pc = new RTCPeerConnection();
+        let localVideo = document.getElementById('local-video');
+        let remoteVideo = document.getElementById('remote-video');
+        let channel;
+
+        // Create data channel immediately upon connection
+        channel = pc.createDataChannel('chat');
+        setupDataChannel(channel);
+
+        // When the 'Start' button is clicked, request media access and start the call
+        document.getElementById('start').addEventListener('click', async () => {
+            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = stream;
+            stream.getTracks().forEach((track) => {
+                pc.addTrack(track, stream);
+            });
+
+            let offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            socket.emit('offer', offer);
+        });
+
+        pc.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        socket.on('offer', async (offer) => {
+            pc.ondatachannel = (event) => {
+                channel = event.channel;
+                setupDataChannel(channel);
+            };
+
+            await pc.setRemoteDescription(offer);
+
+            let answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            socket.emit('answer', answer);
+        });
+
+        socket.on('answer', (answer) => {
+            pc.setRemoteDescription(answer);
+        });
+
+        pc.onicecandidate = ({candidate}) => {
+            socket.emit('candidate', candidate);
+        };
+
+        socket.on('candidate', (candidate) => {
+            pc.addIceCandidate(candidate);
+        });
+
+        document.getElementById('message-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const message = document.getElementById('message-input').value;
+            document.getElementById('message-input').value = '';
+            channel.send(message);
+        });
+
+        function setupDataChannel(dataChannel) {
+            dataChannel.onmessage = (event) => {
+                document.getElementById('messages').innerText += '\n' + event.data;
+            };
+        }
+    </script>
+</body>
+</html>

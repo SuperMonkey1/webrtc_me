@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Video Streaming Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <video id="local-video" autoplay muted></video>
+    <video id="remote-video" autoplay></video>
+    <button id="start">Start</button>
+
+    <script>
+        let socket = io.connect('<Your Heroku Server URL>'); // Replace with your Heroku server URL
+        let pc = new RTCPeerConnection({
+            iceServers: [
+                {
+                    urls: "stun:stun.stunprotocol.org"
+                },
+                {
+                    urls: "turn:<Your TURN server URL>", // Replace with your TURN server
+                    username: "<Your TURN server username>", // Replace with your TURN server username
+                    credential: "<Your TURN server credential>" // Replace with your TURN server credential
+                }
+            ]
+        });
+        let localVideo = document.getElementById('local-video');
+        let remoteVideo = document.getElementById('remote-video');
+
+        // When the 'Start' button is clicked, request media access and start the call
+        document.getElementById('start').addEventListener('click', async () => {
+            let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = stream;
+            stream.getTracks().forEach((track) => {
+                pc.addTrack(track, stream);
+            });
+
+            let offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            socket.emit('offer', offer);
+        });
+
+        pc.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        socket.on('offer', async (offer) => {
+            await pc.setRemoteDescription(offer);
+
+            let answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            socket.emit('answer', answer);
+        });
+
+        socket.on('answer', (answer) => {
+            pc.setRemoteDescription(answer);
+        });
+
+        pc.onicecandidate = ({candidate}) => {
+            socket.emit('candidate', candidate);
+        };
+
+        socket.on('candidate', (candidate) => {
+            pc.addIceCandidate(candidate);
+        });
+    </script>
+</body>
+</html>

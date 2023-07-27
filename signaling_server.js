@@ -33,38 +33,41 @@ app.get('/', function(req, res) {
 //   }
 // });
 
+
 app.get('/iceservers', (req, res) => {
-  // Node Get ICE STUN and TURN list
-  let options = {
-      format: "urls"
+  let o = {
+    format: "urls"
   };
-
-  let bodyString = JSON.stringify(options);
   let https = require("https");
-  let request_options = {
-      host: "global.xirsys.net",
-      path: "/_turn/freleys",
-      method: "PUT",
-      headers: {
-          "Authorization": "Basic " + Buffer.from(process.env.XIRSYS_CREDENTIALS).toString("base64"),
-          "Content-Type": "application/json",
-          "Content-Length": bodyString.length
-      }
+  let bodyString = JSON.stringify(o);
+  let options = {
+    host: "global.xirsys.net",
+    path: "/_turn/freleys",
+    method: "PUT",
+    headers: {
+      "Authorization": "Basic " + Buffer.from(process.env.XIRSYS_CREDENTIAL).toString("base64"),
+      "Content-Type": "application/json",
+      "Content-Length": bodyString.length
+    }
   };
-
-  let httpreq = https.request(request_options, function(httpres) {
-      let str = "";
-      httpres.on("data", function(data){ str += data; });
-      httpres.on("error", function(e){ console.log("error: ",e); });
-      httpres.on("end", function(){ 
-          console.log("ICE List: ", str);
-          res.send(str); // Send the list to client
-      });
+  let httpreq = https.request(options, function(httpres) {
+    let str = "";
+    httpres.on("data", function(data){ str += data; });
+    httpres.on("error", function(e){ console.log("error: ",e); });
+    httpres.on("end", function(){ 
+      let parsed = JSON.parse(str);
+      if (parsed.s === "ok") {
+        res.json([parsed.v.iceServers]);  // Send an array of ICE server objects.
+      } else {
+        console.error('Error fetching ICE servers:', parsed.s);
+        res.status(500).send('Error fetching ICE servers');
+      }
+    });
   });
-
   httpreq.on("error", function(e){ console.log("request error: ",e); });
-  httpreq.end(bodyString); 
+  httpreq.end();
 });
+
 
 
 io.on('connection', socket => {

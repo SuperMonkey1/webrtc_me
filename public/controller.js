@@ -1,5 +1,6 @@
 //let socket = io.connect('http://localhost:3000');const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(accountSid, authToken);
 
 let twilio_client_tokens = await client.tokens.create();

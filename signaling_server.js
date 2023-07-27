@@ -20,12 +20,17 @@ app.get('/iceservers', async (req, res) => {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const client = require('twilio')(accountSid, authToken);
 
-  let twilio_client_tokens = await client.tokens.create();
-  let myIceServers = twilio_client_tokens.ice_servers;
+  try {
+    let twilio_client_tokens = await client.tokens.create();
+    let myIceServers = twilio_client_tokens.ice_servers;
 
-  console.log(myIceServers); 
-  
-  res.json(myIceServers);
+    console.log(myIceServers); // This will print the JSON to your server console
+
+    res.json(myIceServers);
+  } catch (error) {
+    console.error('Error creating Twilio token:', error);
+    res.status(500).send('Error creating Twilio token');
+  }
 });
 
 

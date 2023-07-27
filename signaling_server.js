@@ -10,6 +10,11 @@ const io = socketIO(server);
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve "about.html" on root URL
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/public/controller.html'));
+});
+
 io.on('connection', socket => {
   console.log('User connected');
 

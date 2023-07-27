@@ -12,4 +12,9 @@ git push
 npm install express socket.io
 node signaling_server.js
 
+# heroku 
+heroku login
+git push heroku master
+heroku open
+
 # visiting heroku website: https://your-app-name.herokuapp.com/robot.html

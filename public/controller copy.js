@@ -1,4 +1,5 @@
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+
 let channel;
 
 fetch('/iceservers')
@@ -14,13 +15,6 @@ fetch('/iceservers')
         }
     };
 
-    pc.ondatachannel = (event) => {
-        channel = event.channel;
-        channel.onmessage = (event) => {
-            document.getElementById('messages').innerText += '\n' + event.data;
-        };
-    };
-
     pc.onicecandidate = ({candidate}) => {
         socket.emit('candidate', candidate);
     };
@@ -33,6 +27,13 @@ fetch('/iceservers')
     });
 
     socket.on('offer', async (offer) => {
+        pc.ondatachannel = (event) => {
+            channel = event.channel;
+            channel.onmessage = (event) => {
+                document.getElementById('messages').innerText += '\n' + event.data;
+            };
+        };
+
         await pc.setRemoteDescription(offer);
 
         const answer = await pc.createAnswer();

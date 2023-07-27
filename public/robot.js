@@ -1,25 +1,37 @@
+//let socket = io.connect('http://localhost:3000');
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
-let channel;
+
 let pc = new RTCPeerConnection();
+let channel;
+
 let localVideo = document.getElementById('local-video');
 
-let stream;
 navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(s => {
-        stream = s;
-        localVideo.srcObject = stream;
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-        socket.emit('robot_ready'); // Emit an event to notify that the robot is ready.
-    })
-    .catch(error => {
-        console.error('Error accessing media devices.', error);
-    });
+.then(stream => {
+    localVideo.srcObject = stream;
+
+    // Add the video track to the peer connection
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+})
+.catch(error => {
+    console.error('Error accessing media devices.', error);
+});
 
 pc.onicecandidate = ({candidate}) => {
-    if (candidate) {
-        socket.emit('candidate', candidate);
-    }
+    socket.emit('candidate', candidate);
 };
+
+document.getElementById('connect').addEventListener('click', async () => {
+    channel = pc.createDataChannel('chat');
+    channel.onmessage = (event) => {
+        document.getElementById('messages').innerText += '\n' + event.data;
+    };
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    socket.emit('offer', offer);
+});
 
 socket.on('offer', async (offer) => {
     pc.ondatachannel = (event) => {

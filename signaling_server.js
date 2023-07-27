@@ -15,22 +15,55 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname + '/public/controller.html'));
 });
 
-app.get('/iceservers', async (req, res) => {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const client = require('twilio')(accountSid, authToken);
+// app.get('/iceservers', async (req, res) => {
+//   const accountSid = process.env.TWILIO_ACCOUNT_SID;
+//   const authToken = process.env.TWILIO_AUTH_TOKEN;
+//   const client = require('twilio')(accountSid, authToken);
 
-  try {
-    let twilio_client_tokens = await client.tokens.create();
-    let myIceServers = twilio_client_tokens.ice_servers;
+//   try {
+//     let twilio_client_tokens = await client.tokens.create();
+//     let myIceServers = twilio_client_tokens.ice_servers;
 
-    console.log(myIceServers); // This will print the JSON to your server console
+//     console.log(myIceServers); // This will print the JSON to your server console
 
-    res.json(myIceServers);
-  } catch (error) {
-    console.error('Error creating Twilio token:', error);
-    res.status(500).send('Error creating Twilio token');
-  }
+//     res.json(myIceServers);
+//   } catch (error) {
+//     console.error('Error creating Twilio token:', error);
+//     res.status(500).send('Error creating Twilio token');
+//   }
+// });
+
+app.get('/iceservers', (req, res) => {
+  // Node Get ICE STUN and TURN list
+  let options = {
+      format: "urls"
+  };
+
+  let bodyString = JSON.stringify(options);
+  let https = require("https");
+  let request_options = {
+      host: "global.xirsys.net",
+      path: "/_turn/freleys",
+      method: "PUT",
+      headers: {
+          "Authorization": "Basic " + Buffer.from(process.env.XIRSYS_CREDENTIALS).toString("base64"),
+          "Content-Type": "application/json",
+          "Content-Length": bodyString.length
+      }
+  };
+
+  let httpreq = https.request(request_options, function(httpres) {
+      let str = "";
+      httpres.on("data", function(data){ str += data; });
+      httpres.on("error", function(e){ console.log("error: ",e); });
+      httpres.on("end", function(){ 
+          console.log("ICE List: ", str);
+          res.send(str); // Send the list to client
+      });
+  });
+
+  httpreq.on("error", function(e){ console.log("request error: ",e); });
+  httpreq.end(bodyString); 
 });
 
 

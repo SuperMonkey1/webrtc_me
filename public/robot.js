@@ -1,4 +1,6 @@
-let socket = io.connect('http://localhost:3000');
+//let socket = io.connect('http://localhost:3000');
+let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+
 let pc = new RTCPeerConnection();
 let channel;
 

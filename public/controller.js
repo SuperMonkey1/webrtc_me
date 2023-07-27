@@ -1,19 +1,26 @@
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
 let channel;
+let pc = new RTCPeerConnection();
+let remoteVideo = document.getElementById('remote-video');
 
-fetch('/iceservers')
-.then(response => response.json())
-.then(myIceServers => {
-    let pc = new RTCPeerConnection({ iceServers: myIceServers });
-    
-    let remoteVideo = document.getElementById('remote-video');
+pc.ontrack = (event) => {
+    if (remoteVideo.srcObject !== event.streams[0]) {
+        remoteVideo.srcObject = event.streams[0];
+    }
+};
 
-    pc.ontrack = (event) => {
-        if (remoteVideo.srcObject !== event.streams[0]) {
-            remoteVideo.srcObject = event.streams[0];
-        }
-    };
+pc.onicecandidate = ({candidate}) => {
+    socket.emit('candidate', candidate);
+};
 
+document.getElementById('connect').addEventListener('click', async () => {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    socket.emit('offer', offer);
+});
+
+socket.on('offer', async (offer) => {
     pc.ondatachannel = (event) => {
         channel = event.channel;
         channel.onmessage = (event) => {
@@ -21,38 +28,26 @@ fetch('/iceservers')
         };
     };
 
-    pc.onicecandidate = ({candidate}) => {
-        socket.emit('candidate', candidate);
-    };
+    await pc.setRemoteDescription(offer);
 
-    document.getElementById('connect').addEventListener('click', async () => {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
 
-        socket.emit('offer', offer);
-    });
-
-    socket.on('offer', async (offer) => {
-        await pc.setRemoteDescription(offer);
-
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-
-        socket.emit('answer', answer);
-    });
-
-    socket.on('answer', (answer) => {
-        pc.setRemoteDescription(answer);
-    });
-
-    socket.on('candidate', (candidate) => {
-        pc.addIceCandidate(candidate);
-    });
-
-    document.getElementById('message-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const message = document.getElementById('message-input').value;
-        document.getElementById('message-input').value = '';
-        channel.send(message);
-    });
+    socket.emit('answer', answer);
 });
+
+socket.on('answer', (answer) => {
+    pc.setRemoteDescription(answer);
+});
+
+socket.on('candidate', (candidate) => {
+    pc.addIceCandidate(candidate);
+});
+
+document.getElementById('message-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const message = document.getElementById('message-input').value;
+    document.getElementById('message-input').value = '';
+    channel.send(message);
+});
+

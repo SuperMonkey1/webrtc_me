@@ -15,6 +15,18 @@ app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname + '/public/controller.html'));
 });
 
+app.get('/iceservers', async (req, res) => {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const client = require('twilio')(accountSid, authToken);
+
+  let twilio_client_tokens = await client.tokens.create();
+  let myIceServers = twilio_client_tokens.ice_servers;
+
+  res.json(myIceServers);
+});
+
+
 io.on('connection', socket => {
   console.log('User connected');
 

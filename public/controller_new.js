@@ -1,10 +1,13 @@
-//let socket = io.connect('http://localhost:3000');
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
-
-let pc = new RTCPeerConnection();
 let channel;
-
+let pc = new RTCPeerConnection();
 let remoteVideo = document.getElementById('remote-video');
+let connectButton = document.getElementById('connect');
+connectButton.disabled = true; // Initially disable the button
+
+socket.on('robot_ready', () => {
+    connectButton.disabled = false; // Enable the button when the robot is ready
+});
 
 pc.ontrack = (event) => {
     if (remoteVideo.srcObject !== event.streams[0]) {
@@ -13,15 +16,10 @@ pc.ontrack = (event) => {
 };
 
 pc.onicecandidate = ({candidate}) => {
-    socket.emit('candidate', candidate);
+    if (candidate) {
+        socket.emit('candidate', candidate);
+    }
 };
-
-document.getElementById('connect').addEventListener('click', async () => {
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-
-    socket.emit('offer', offer);
-});
 
 socket.on('offer', async (offer) => {
     pc.ondatachannel = (event) => {
@@ -52,4 +50,16 @@ document.getElementById('message-form').addEventListener('submit', function(even
     const message = document.getElementById('message-input').value;
     document.getElementById('message-input').value = '';
     channel.send(message);
+});
+
+connectButton.addEventListener('click', async () => {
+    channel = pc.createDataChannel('chat');
+    channel.onmessage = (event) => {
+        document.getElementById('messages').innerText += '\n' + event.data;
+    };
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    socket.emit('offer', offer);
 });

@@ -10,15 +10,10 @@ pc.ontrack = (event) => {
 };
 
 pc.onicecandidate = ({candidate}) => {
-    socket.emit('candidate', candidate);
+    if (candidate) {
+        socket.emit('candidate', candidate);
+    }
 };
-
-document.getElementById('connect').addEventListener('click', async () => {
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-
-    socket.emit('offer', offer);
-});
 
 socket.on('offer', async (offer) => {
     pc.ondatachannel = (event) => {
@@ -51,3 +46,9 @@ document.getElementById('message-form').addEventListener('submit', function(even
     channel.send(message);
 });
 
+document.getElementById('connect').addEventListener('click', async () => {
+    channel = pc.createDataChannel('chat');
+    channel.onmessage = (event) => {
+        document.getElementById('messages').innerText += '\n' + event.data;
+    };
+});

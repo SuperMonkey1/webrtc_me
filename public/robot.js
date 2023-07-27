@@ -13,7 +13,7 @@ navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     });
 
 
-let pc = new RTCPeerConnection({ iceServers: myIceServers });
+let pc = new RTCPeerConnection();
 
 // Add the video track to the peer connection
 if (stream) {

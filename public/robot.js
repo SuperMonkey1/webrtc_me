@@ -1,7 +1,15 @@
 //let socket = io.connect('http://localhost:3000');
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
+
+let twilio_client_tokens = await client.tokens.create();
+let myIceServers = twilio_client_tokens.ice_servers;
+var configuration = { iceServers: myIceServers};
+
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
 
-let pc = new RTCPeerConnection();
+let pc = new RTCPeerConnection(configuration);
 let channel;
 
 let localVideo = document.getElementById('local-video');

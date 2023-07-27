@@ -22,7 +22,7 @@ app.get('/iceservers', async (req, res) => {
 
   let twilio_client_tokens = await client.tokens.create();
   let myIceServers = twilio_client_tokens.ice_servers;
-
+  console.log(myIceServers)
   res.json(myIceServers);
 });
 

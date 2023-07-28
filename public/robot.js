@@ -8,8 +8,19 @@ let localVideo = document.getElementById('local-video');
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 .then(response => response.json())
-.then(iceServers => {
-    // Use the retrieved ICE servers in the RTCPeerConnection
+.then(data => {
+
+    const username = data.v.iceServers.username;
+    const credential = data.v.iceServers.credential;
+
+    // Format the ICE servers as expected by RTCPeerConnection
+    const iceServers = data.v.iceServers.urls.map(url => ({
+        urls: url,
+        username: username,
+        credential: credential
+    }));
+
+    
     pc = new RTCPeerConnection({iceServers});
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })

@@ -25,7 +25,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     
     pc = new RTCPeerConnection({iceServers});
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
     .then(stream => {
         localVideo.srcObject = stream;
 

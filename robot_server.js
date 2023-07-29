@@ -1,21 +1,38 @@
-// Import the necessary libraries
 const express = require('express');
-const onoff = require('onoff');
+const http = require('http');
+const socketIO = require('socket.io');
+const cors = require('cors');  // Include cors package
 
-const Gpio = onoff.Gpio;
-const led = new Gpio(4, 'out'); // Set GPIO 4 to output
+// const Gpio = require('onoff').Gpio;
+// const motor = new Gpio(4, 'out');
 
-// Create an Express application
 const app = express();
+app.use(cors());  // Use cors middleware
 
-// Handle POST request to /led
-app.post('/led', function(req, res) {
-    let value = req.body.value;
-    led.writeSync(value); // Turn LED on or off depending on the value
-    res.sendStatus(200);
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+        origin: "*", // Allow all origins
+        methods: ["GET", "POST"]
+    }
 });
 
-// Start the server
-app.listen(3000, function() {
-    console.log('Listening on port 3000');
+io.on('connection', (socket) => {
+    console.log('User connected');
+
+    socket.on('motor-command', (command) => {
+        console.log('Motor command:', command);
+
+        // if (command === 'start') {
+        //     motor.writeSync(1);
+        // } else if (command === 'stop') {
+        //     motor.writeSync(0);
+        // }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
 });
+
+server.listen(8080, () => {console.log('Listening on port 8080');});

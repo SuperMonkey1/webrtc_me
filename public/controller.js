@@ -34,6 +34,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     };
 
     document.getElementById('connect').addEventListener('click', async () => {
+        console.log("Connect button clicked")
         socket.emit('initiate-negotiation');
     });
 

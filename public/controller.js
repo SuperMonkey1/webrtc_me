@@ -45,7 +45,6 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     });
 
     document.getElementById('start').addEventListener('click', async () => {
-        channel = pc.createDataChannel('chat');
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
         socket.emit('offer', offer);

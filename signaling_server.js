@@ -75,6 +75,10 @@ io.on('connection', socket => {
     socket.broadcast.emit('offer', offer);
   });
 
+  socket.on('initiate_connection', (offer) => {
+    socket.broadcast.emit('initiate_connection', offer);
+  });
+
   socket.on('answer', (answer) => {
     socket.broadcast.emit('answer', answer);
   });

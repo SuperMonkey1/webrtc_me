@@ -26,18 +26,18 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     
     pc = new RTCPeerConnection({iceServers});
 
-    navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
-    .then(stream => {
-        console.log("got userstream")
+    // navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
+    // .then(stream => {
+    //     console.log("got userstream")
 
-        localVideo.srcObject = stream;
+    //     localVideo.srcObject = stream;
 
-        // Add the video track to the peer connection
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-    })
-    .catch(error => {
-        console.error('Error accessing media devices.', error);
-    });
+    //     // Add the video track to the peer connection
+    //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    // })
+    // .catch(error => {
+    //     console.error('Error accessing media devices.', error);
+    // });
 
     pc.onicecandidate = ({candidate}) => {
         console.log("onicecandidat")
@@ -65,11 +65,27 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
             };
         };
 
-        await pc.setRemoteDescription(offer);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        console.log("emitting answer")
-        socket.emit('answer', answer);
+        await navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
+            .then(async (stream) => {
+                console.log("got userstream")
+
+                localVideo.srcObject = stream;
+
+                // Add the video track to the peer connection
+                stream.getTracks().forEach(track => pc.addTrack(track, stream));
+                await pc.setRemoteDescription(offer);
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                console.log("emitting answer")
+                socket.emit('answer', answer);
+           
+           
+            })
+            .catch(error => {
+                console.error('Error accessing media devices.', error);
+            });
+
+        
     });
 
     socket.on('answer', (answer) => {

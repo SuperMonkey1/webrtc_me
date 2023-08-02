@@ -68,7 +68,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect_me', () => {
             // Inform the other peer to also close the connection
             console.log("connection disconnected by the controller")
             pc.close();

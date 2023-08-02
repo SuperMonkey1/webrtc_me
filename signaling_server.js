@@ -79,7 +79,7 @@ io.on('connection', socket => {
     socket.broadcast.emit('initiate_connection', offer);
   });
 
-  socket.on('disconnect', (offer) => {
+  socket.on('disconnect_me', (offer) => {
     socket.broadcast.emit('initiate_connection', offer);
   });
 

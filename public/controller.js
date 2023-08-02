@@ -50,7 +50,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
     });
 
-    document.getElementById('disconnect').addEventListener('click', () => {
+    document.getElementById('disconnect_me').addEventListener('click', () => {
         console.log("on disconnect")
     
         // Close the RTCPeerConnection
@@ -59,7 +59,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         }
     
         // Send a message to the server to inform the other end to also close the connection
-        socket.emit('disconnect');
+        socket.emit('disconnect_me');
     });
 
     socket.on('offer', async (offer) => {

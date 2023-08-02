@@ -40,11 +40,24 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         socket.emit('candidate', candidate);
     };
 
-    document.getElementById('connect').addEventListener('click', async () => {
+    // document.getElementById('connect').addEventListener('click', async () => {
+    //     channel = pc.createDataChannel('chat');
+    //     channel.onmessage = (event) => {
+    //         document.getElementById('messages').innerText += '\n' + event.data;
+    //         localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+    //     };
+
+    //     const offer = await pc.createOffer();
+    //     await pc.setLocalDescription(offer);
+
+    //     socket.emit('offer', offer);
+    // });
+
+    socket.on('initiate-negotiation', async () => {
         channel = pc.createDataChannel('chat');
         channel.onmessage = (event) => {
             document.getElementById('messages').innerText += '\n' + event.data;
-            localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+            localSocket.emit('motor-command', event.data);
         };
 
         const offer = await pc.createOffer();

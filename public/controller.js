@@ -41,12 +41,12 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         channel = pc.createDataChannel('chat');
         channel.onmessage = (event) => {
             document.getElementById('messages').innerText += '\n' + event.data;
-            localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
         };
     
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-    
+        
+        console.log("Emiting initiate offer")
         socket.emit('offer', offer);
     });
 

@@ -38,6 +38,8 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     });
 
     socket.on('initiate-negotiation', async () => {
+        console.log("start initiate-negotiation")
+
         channel = pc.createDataChannel('chat');
         channel.onmessage = (event) => {
             document.getElementById('messages').innerText += '\n' + event.data;

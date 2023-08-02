@@ -60,21 +60,21 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
             });
 
 
-            // pc.ondatachannel = (event) => {
-            //     channel = event.channel;
-            //     channel.onmessage = (event) => {
-            //         document.getElementById('messages').innerText += '\n' + event.data;
-            //         //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
-            //     };
-            // };
-
-            // Create a data channel
-            channel = pc.createDataChannel('chat');
-            channel.onmessage = (event) => {
-                document.getElementById('messages').innerText += '\n' + event.data;
-                //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
-
+            pc.ondatachannel = (event) => {
+                channel = event.channel;
+                channel.onmessage = (event) => {
+                    document.getElementById('messages').innerText += '\n' + event.data;
+                    //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+                };
             };
+
+            // // Create a data channel
+            // channel = pc.createDataChannel('chat');
+            // channel.onmessage = (event) => {
+            //     document.getElementById('messages').innerText += '\n' + event.data;
+            //     //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+
+            // };
 
             await pc.setRemoteDescription(offer);
             const answer = await pc.createAnswer();
@@ -94,7 +94,11 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
             event.preventDefault();
             const message = document.getElementById('message-input').value;
             document.getElementById('message-input').value = '';
-            channel.send(message);
+            if (channel) {
+                channel.send(message);
+            } else {
+                console.error('Data channel is not open');
+            }
         });
     })
     .catch(error => {

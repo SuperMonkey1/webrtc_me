@@ -5,6 +5,18 @@ let channel;
 
 let remoteVideo = document.getElementById('remote-video');
 
+
+function sendMessage(event) {
+    event.preventDefault();
+    const message = document.getElementById('message-input').value;
+    document.getElementById('message-input').value = '';
+    if (channel) {
+        channel.send(message);
+    } else {
+        console.error('Data channel is not open');
+    }
+}
+
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 .then(response => response.json())
@@ -40,7 +52,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
             pc.close();
             pc = null;
         }
-        // Create a new peer connection for the next time the 'start' button is clicked
+        document.getElementById('message-form').removeEventListener('submit', sendMessage);
         pc = new RTCPeerConnection({iceServers});
     });
 
@@ -48,10 +60,9 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
          // Create a data channel
         channel = pc.createDataChannel('chat');
-        channel.onmessage = (event) => {
-            document.getElementById('messages').innerText += '\n' + event.data;
+        channel.onopen = function(event) {
+            document.getElementById('message-form').addEventListener('submit', sendMessage);
         };
-
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
         socket.emit('offer', offer);
@@ -66,10 +77,8 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         };
 
         await pc.setRemoteDescription(offer);
-
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-
         socket.emit('answer', answer);
     });
 
@@ -81,12 +90,12 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         pc.addIceCandidate(candidate);
     });
 
-    document.getElementById('message-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const message = document.getElementById('message-input').value;
-        document.getElementById('message-input').value = '';
-        channel.send(message);
-    });
+    // document.getElementById('message-form').addEventListener('submit', function(event) {
+    //     event.preventDefault();
+    //     const message = document.getElementById('message-input').value;
+    //     document.getElementById('message-input').value = '';
+    //     channel.send(message);
+    // });
 })
 .catch(error => {
     console.error('Error fetching ICE servers.', error);

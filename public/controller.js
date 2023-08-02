@@ -33,10 +33,20 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         socket.emit('candidate', candidate);
     };
 
-    document.getElementById('connect').addEventListener('click', async () => {
+    document.getElementById('stop').addEventListener('click', () => {
+        // Disconnect from the robot and stop streaming video
+        if (pc) {
+            pc.getTracks().forEach(track => track.stop());
+            pc.close();
+            pc = null;
+        }
+        // Create a new peer connection for the next time the 'start' button is clicked
+        pc = new RTCPeerConnection({iceServers});
+    });
+    
+    document.getElementById('start').addEventListener('click', async () => {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-
         socket.emit('offer', offer);
     });
 

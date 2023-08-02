@@ -15,6 +15,7 @@ node signaling_server.js
 # heroku 
 heroku login
 git push heroku master
+git push heroku start_stop:master
 heroku open
 
 # visiting heroku website: https://your-app-name.herokuapp.com/robot.html

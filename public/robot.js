@@ -1,6 +1,6 @@
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
 //let localSocket = io.connect('http://your-raspberry-pi-ip-address:8080'); // Connect to local Socket.io server
-let localSocket = io.connect('http://localhost:8080'); // Connect to local Socket.io server
+//let localSocket = io.connect('http://localhost:8080'); // Connect to local Socket.io server
 
 let pc;
 let channel;
@@ -60,7 +60,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
                 channel = event.channel;
                 channel.onmessage = (event) => {
                     document.getElementById('messages').innerText += '\n' + event.data;
-                    localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+                    //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
                 };
             };
 

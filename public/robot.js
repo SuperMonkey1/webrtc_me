@@ -26,18 +26,18 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
         pc = new RTCPeerConnection({ iceServers });
 
-        // navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
-        // .then(stream => {
-        //     console.log("got userstream")
+        navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
+        .then(stream => {
+            console.log("got userstream")
 
-        //     localVideo.srcObject = stream;
+            localVideo.srcObject = stream;
 
-        //     // Add the video track to the peer connection
-        //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
-        // })
-        // .catch(error => {
-        //     console.error('Error accessing media devices.', error);
-        // });
+            // Add the video track to the peer connection
+            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+        })
+        .catch(error => {
+            console.error('Error accessing media devices.', error);
+        });
 
         pc.onicecandidate = ({ candidate }) => {
             console.log("onicecandidat")
@@ -54,32 +54,46 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         //     socket.emit('offer', offer);
         // });
 
-        socket.on('offer', async (offer) => {
-            console.log("socket on offer")
-
-            pc.ondatachannel = (event) => {
-                channel = event.channel;
-                channel.onmessage = (event) => {
-                    document.getElementById('messages').innerText += '\n' + event.data;
-                    //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
-                };
+        socket.on('initiate_connection', async () => {
+            console.log("socket on initiate_connection")
+            channel = pc.createDataChannel('chat');
+            channel.onmessage = (event) => {
+                console.log("channel.onmessage")
+                document.getElementById('messages').innerText += '\n' + event.data;
+                //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
             };
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            socket.emit('offer', offer);
 
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ width: 640, height: 480, video: true, audio: false })
-                console.log("got userstream")
-                localVideo.srcObject = stream;
-                stream.getTracks().forEach(track => pc.addTrack(track, stream));
-                await pc.setRemoteDescription(offer);
-                const answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                console.log("emitting answer")
-                socket.emit('answer', answer);
-
-            } catch (error) {
-                console.error('Error accessing media devices.', error);
-            };
         });
+
+        // socket.on('offer', async (offer) => {
+        //     console.log("socket on offer")
+
+        //     pc.ondatachannel = (event) => {
+        //         channel = event.channel;
+        //         channel.onmessage = (event) => {
+        //             document.getElementById('messages').innerText += '\n' + event.data;
+        //             //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+        //         };
+        //     };
+
+        //     try {
+        //         const stream = await navigator.mediaDevices.getUserMedia({ width: 640, height: 480, video: true, audio: false })
+        //         console.log("got userstream")
+        //         localVideo.srcObject = stream;
+        //         stream.getTracks().forEach(track =>  pc.addTrack(track, stream));
+        //         await pc.setRemoteDescription(offer);
+        //         const answer = await pc.createAnswer();
+        //         await pc.setLocalDescription(answer);
+        //         console.log("emitting answer")
+        //         socket.emit('answer', answer);
+
+        //     } catch (error) {
+        //         console.error('Error accessing media devices.', error);
+        //     };
+        // });
 
         socket.on('answer', (answer) => {
             console.log("socket on answer")

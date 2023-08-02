@@ -1,16 +1,17 @@
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+//let localSocket = io.connect('http://your-raspberry-pi-ip-address:8080'); // Connect to local Socket.io server
+let localSocket = io.connect('http://localhost:8080'); // Connect to local Socket.io server
 
 let pc;
 let channel;
 
-let remoteVideo = document.getElementById('remote-video');
+let localVideo = document.getElementById('local-video');
 
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 .then(response => response.json())
 .then(data => {
-    // Use the retrieved ICE servers in the RTCPeerConnection
-    
+
     const username = data.v.iceServers.username;
     const credential = data.v.iceServers.credential;
 
@@ -20,28 +21,59 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         username: username,
         credential: credential
     }));
+
     
     pc = new RTCPeerConnection({iceServers});
 
-    pc.ontrack = (event) => {
-        if (remoteVideo.srcObject !== event.streams[0]) {
-            remoteVideo.srcObject = event.streams[0];
-        }
-    };
+    navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
+    .then(stream => {
+        localVideo.srcObject = stream;
+
+        // Add the video track to the peer connection
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
+    })
+    .catch(error => {
+        console.error('Error accessing media devices.', error);
+    });
 
     pc.onicecandidate = ({candidate}) => {
         socket.emit('candidate', candidate);
     };
 
-    document.getElementById('connect').addEventListener('click', async () => {
-        socket.emit('initiate-negotiation');
+    socket.on('initiate-negotiation', async () => {
+        channel = pc.createDataChannel('chat');
+        channel.onmessage = (event) => {
+            document.getElementById('messages').innerText += '\n' + event.data;
+            localSocket.emit('motor-command', event.data);
+        };
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        socket.emit('offer', offer);
     });
+
+
+
+    // document.getElementById('connect').addEventListener('click', async () => {
+    //     channel = pc.createDataChannel('chat');
+    //     channel.onmessage = (event) => {
+    //         document.getElementById('messages').innerText += '\n' + event.data;
+    //         localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+    //     };
+
+    //     const offer = await pc.createOffer();
+    //     await pc.setLocalDescription(offer);
+
+    //     socket.emit('offer', offer);
+    // });
 
     socket.on('offer', async (offer) => {
         pc.ondatachannel = (event) => {
             channel = event.channel;
             channel.onmessage = (event) => {
                 document.getElementById('messages').innerText += '\n' + event.data;
+                localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
             };
         };
 

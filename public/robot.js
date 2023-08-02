@@ -9,103 +9,99 @@ let localVideo = document.getElementById('local-video');
 
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
-.then(response => response.json())
-.then(data => {
-    console.log("fetched ice servers")
+    .then(response => response.json())
+    .then(data => {
+        console.log("fetched ice servers")
 
-    const username = data.v.iceServers.username;
-    const credential = data.v.iceServers.credential;
+        const username = data.v.iceServers.username;
+        const credential = data.v.iceServers.credential;
 
-    // Format the ICE servers as expected by RTCPeerConnection
-    const iceServers = data.v.iceServers.urls.map(url => ({
-        urls: url,
-        username: username,
-        credential: credential
-    }));
+        // Format the ICE servers as expected by RTCPeerConnection
+        const iceServers = data.v.iceServers.urls.map(url => ({
+            urls: url,
+            username: username,
+            credential: credential
+        }));
 
-    
-    pc = new RTCPeerConnection({iceServers});
 
-    // navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
-    // .then(stream => {
-    //     console.log("got userstream")
+        pc = new RTCPeerConnection({ iceServers });
 
-    //     localVideo.srcObject = stream;
+        // navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
+        // .then(stream => {
+        //     console.log("got userstream")
 
-    //     // Add the video track to the peer connection
-    //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
-    // })
-    // .catch(error => {
-    //     console.error('Error accessing media devices.', error);
-    // });
+        //     localVideo.srcObject = stream;
 
-    pc.onicecandidate = ({candidate}) => {
-        console.log("onicecandidat")
-        socket.emit('candidate', candidate);
-    };
+        //     // Add the video track to the peer connection
+        //     stream.getTracks().forEach(track => pc.addTrack(track, stream));
+        // })
+        // .catch(error => {
+        //     console.error('Error accessing media devices.', error);
+        // });
 
-    // document.getElementById('connect').addEventListener('click', async () => {
-    //     console.log("on connect")
-
-    //     const offer = await pc.createOffer();
-    //     await pc.setLocalDescription(offer);
-    //     console.log("emitting offer")
-
-    //     socket.emit('offer', offer);
-    // });
-
-    socket.on('offer', async (offer) => {
-        console.log("socket on offer")
-
-        pc.ondatachannel = (event) => {
-            channel = event.channel;
-            channel.onmessage = (event) => {
-                document.getElementById('messages').innerText += '\n' + event.data;
-                //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
-            };
+        pc.onicecandidate = ({ candidate }) => {
+            console.log("onicecandidat")
+            socket.emit('candidate', candidate);
         };
 
-        await navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
-            .then(stream => {
+        // document.getElementById('connect').addEventListener('click', async () => {
+        //     console.log("on connect")
+
+        //     const offer = await pc.createOffer();
+        //     await pc.setLocalDescription(offer);
+        //     console.log("emitting offer")
+
+        //     socket.emit('offer', offer);
+        // });
+
+        socket.on('offer', async (offer) => {
+            console.log("socket on offer")
+
+            pc.ondatachannel = (event) => {
+                channel = event.channel;
+                channel.onmessage = (event) => {
+                    document.getElementById('messages').innerText += '\n' + event.data;
+                    //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+                };
+            };
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ width: 640, height: 480, video: true, audio: false })
                 console.log("got userstream")
-
                 localVideo.srcObject = stream;
-
-                // Add the video track to the peer connection
                 stream.getTracks().forEach(track => pc.addTrack(track, stream));
-            })
-            .catch(error => {
+                await pc.setRemoteDescription(offer);
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                console.log("emitting answer")
+                socket.emit('answer', answer);
+
+            } catch (error) {
                 console.error('Error accessing media devices.', error);
-            });
+            };
+        });
 
-        await pc.setRemoteDescription(offer);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        console.log("emitting answer")
-        socket.emit('answer', answer);
+        socket.on('answer', (answer) => {
+            console.log("socket on answer")
+
+            pc.setRemoteDescription(answer);
+        });
+
+        socket.on('candidate', (candidate) => {
+            console.log("socket on candidate")
+
+            pc.addIceCandidate(candidate);
+        });
+
+        document.getElementById('message-form').addEventListener('submit', function (event) {
+            console.log("doc on message form")
+
+            event.preventDefault();
+            const message = document.getElementById('message-input').value;
+            document.getElementById('message-input').value = '';
+            channel.send(message);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching ICE servers.', error);
     });
-
-    socket.on('answer', (answer) => {
-        console.log("socket on answer")
-
-        pc.setRemoteDescription(answer);
-    });
-
-    socket.on('candidate', (candidate) => {
-        console.log("socket on candidate")
-
-        pc.addIceCandidate(candidate);
-    });
-
-    document.getElementById('message-form').addEventListener('submit', function(event) {
-        console.log("doc on message form")
-
-        event.preventDefault();
-        const message = document.getElementById('message-input').value;
-        document.getElementById('message-input').value = '';
-        channel.send(message);
-    });
-})
-.catch(error => {
-    console.error('Error fetching ICE servers.', error);
-});

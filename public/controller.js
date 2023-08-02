@@ -37,13 +37,37 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
     document.getElementById('connect').addEventListener('click', async () => {
         console.log("on connect")
+        channel = pc.createDataChannel('chat');
+        channel.onmessage = (event) => {
+            console.log("channel.onmessage")
+            document.getElementById('messages').innerText += '\n' + event.data;
+            //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
+        };
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
         socket.emit('offer', offer);
     });
 
     socket.on('offer', async (offer) => {
-        console.log("on offer")
+        // console.log("on offer")
+
+        // pc.ondatachannel = (event) => {
+        //     channel = event.channel;
+        //     channel.onmessage = (event) => {
+        //         document.getElementById('messages').innerText += '\n' + event.data;
+        //     };
+        // };
+
+        // await pc.setRemoteDescription(offer);
+
+        // const answer = await pc.createAnswer();
+        // await pc.setLocalDescription(answer);
+        // console.log("emitting answer")
+
+        // socket.emit('answer', answer);
+    });
+
+    socket.on('answer', (answer) => {
 
         pc.ondatachannel = (event) => {
             channel = event.channel;
@@ -52,16 +76,6 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
             };
         };
 
-        await pc.setRemoteDescription(offer);
-
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        console.log("emitting answer")
-
-        socket.emit('answer', answer);
-    });
-
-    socket.on('answer', (answer) => {
         console.log("socket.on('answer'")
 
         pc.setRemoteDescription(answer);

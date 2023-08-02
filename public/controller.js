@@ -10,7 +10,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 .then(response => response.json())
 .then(data => {
     // Use the retrieved ICE servers in the RTCPeerConnection
-    
+    console.log("ice servers fetched")
     const username = data.v.iceServers.username;
     const credential = data.v.iceServers.credential;
 
@@ -30,30 +30,21 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     };
 
     pc.onicecandidate = ({candidate}) => {
+        console.log("pc.onicecandidate")
+
         socket.emit('candidate', candidate);
     };
 
     document.getElementById('connect').addEventListener('click', async () => {
-        console.log("Connect button clicked")
-        socket.emit('initiate-negotiation');
-    });
-
-    socket.on('initiate-negotiation', async () => {
-        console.log("start initiate-negotiation")
-
-        channel = pc.createDataChannel('chat');
-        channel.onmessage = (event) => {
-            document.getElementById('messages').innerText += '\n' + event.data;
-        };
-    
+        console.log("on connect")
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        
-        console.log("Emiting initiate offer")
         socket.emit('offer', offer);
     });
 
     socket.on('offer', async (offer) => {
+        console.log("on offer")
+
         pc.ondatachannel = (event) => {
             channel = event.channel;
             channel.onmessage = (event) => {
@@ -65,19 +56,26 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
+        console.log("emitting answer")
 
         socket.emit('answer', answer);
     });
 
     socket.on('answer', (answer) => {
+        console.log("socket.on('answer'")
+
         pc.setRemoteDescription(answer);
     });
 
     socket.on('candidate', (candidate) => {
+        console.log("socket.on('candidate")
+
         pc.addIceCandidate(candidate);
     });
 
     document.getElementById('message-form').addEventListener('submit', function(event) {
+        console.log("on message form")
+
         event.preventDefault();
         const message = document.getElementById('message-input').value;
         document.getElementById('message-input').value = '';

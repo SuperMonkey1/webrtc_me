@@ -38,20 +38,20 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         socket.emit('initiate-negotiation');
     });
 
-    // socket.on('initiate-negotiation', async () => {
-    //     console.log("start initiate-negotiation")
+    socket.on('initiate-negotiation', async () => {
+        console.log("start initiate-negotiation")
 
-    //     channel = pc.createDataChannel('chat');
-    //     channel.onmessage = (event) => {
-    //         document.getElementById('messages').innerText += '\n' + event.data;
-    //     };
+        channel = pc.createDataChannel('chat');
+        channel.onmessage = (event) => {
+            document.getElementById('messages').innerText += '\n' + event.data;
+        };
     
-    //     const offer = await pc.createOffer();
-    //     await pc.setLocalDescription(offer);
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
         
-    //     console.log("Emiting initiate offer")
-    //     socket.emit('offer', offer);
-    // });
+        console.log("Emiting initiate offer")
+        socket.emit('offer', offer);
+    });
 
     socket.on('offer', async (offer) => {
         pc.ondatachannel = (event) => {

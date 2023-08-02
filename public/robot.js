@@ -37,6 +37,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     });
 
     pc.onicecandidate = ({candidate}) => {
+        console.log("pc.onicecandidate")
         socket.emit('candidate', candidate);
     };
 
@@ -76,6 +77,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
     });
 
     socket.on('candidate', (candidate) => {
+        console.log("socket.on('candidate'")
         pc.addIceCandidate(candidate);
     });
 

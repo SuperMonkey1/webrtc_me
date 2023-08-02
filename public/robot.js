@@ -66,26 +66,23 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         };
 
         await navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
-            .then(async (stream) => {
+            .then(stream => {
                 console.log("got userstream")
 
                 localVideo.srcObject = stream;
 
                 // Add the video track to the peer connection
                 stream.getTracks().forEach(track => pc.addTrack(track, stream));
-                await pc.setRemoteDescription(offer);
-                const answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                console.log("emitting answer")
-                socket.emit('answer', answer);
-           
-           
             })
             .catch(error => {
                 console.error('Error accessing media devices.', error);
             });
 
-        
+        await pc.setRemoteDescription(offer);
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        console.log("emitting answer")
+        socket.emit('answer', answer);
     });
 
     socket.on('answer', (answer) => {

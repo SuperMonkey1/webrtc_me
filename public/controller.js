@@ -3,6 +3,8 @@ let pc;
 let channel;
 let remoteVideo = document.getElementById('remote-video');
 let hasController = false;
+let gamepad;
+let hasGamepad = false;
 let controller;
 let throttle = 0;
 
@@ -30,6 +32,7 @@ function getGamepadInput() {
             if(channel && channel.readyState === 'open') {
                 channel.send(JSON.stringify({ throttle: throttle }));
             }
+            document.getElementById("throttleValue").innerText = throttle;
 
             // Update the last sent throttle value
             lastSentThrottle = throttle;

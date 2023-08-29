@@ -29,9 +29,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
         navigator.mediaDevices.getUserMedia({width: 640, height: 480, video: true, audio: false })
         .then(stream => {
             console.log("got userstream")
-
             localVideo.srcObject = stream;
-
             // Add the video track to the peer connection
             stream.getTracks().forEach(track => pc.addTrack(track, stream));
         })
@@ -109,7 +107,6 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
         socket.on('candidate', (candidate) => {
             console.log("socket on candidate")
-
             pc.addIceCandidate(candidate);
         });
 

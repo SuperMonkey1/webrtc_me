@@ -1,9 +1,41 @@
 let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
-
 let pc;
 let channel;
-
 let remoteVideo = document.getElementById('remote-video');
+let hasController = false;
+let controller;
+let throttle = 0;
+
+// Function to check for controller inputs
+function pollController() {
+    // Query the controllers
+    let gamepads = navigator.getGamepads();
+
+    for(let i = 0; i < gamepads.length; i++) {
+        if(gamepads[i]) {
+            // A controller is connected, update the flag and the controller variable
+            hasController = true;
+            controller = gamepads[i];
+            break;
+        }
+    }
+
+    // If a controller is connected, read its values
+    if (hasController) {
+        // Reading the 'A' button for example
+        if (controller.buttons[0].pressed) {
+            console.log('A button pressed');
+        }
+
+        // Reading one of the thumbsticks (for example, the left thumbstick's Y axis)
+        throttle = controller.axes[1]; // Replace this with whichever axis you want to use for throttle
+        console.log('Throttle value:', throttle);
+    }
+
+    // Poll the controller again in the next frame
+    requestAnimationFrame(pollController);
+}
+
 
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
@@ -114,3 +146,6 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 .catch(error => {
     console.error('Error fetching ICE servers.', error);
 });
+
+// Start polling the controller
+pollController();

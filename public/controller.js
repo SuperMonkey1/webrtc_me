@@ -7,6 +7,7 @@ let gamepad;
 let hasGamepad = false;
 let controller;
 let throttle = 0;
+let lastSentThrottle ;
 
 // Function to check for controller inputs
 function getGamepadInput() {

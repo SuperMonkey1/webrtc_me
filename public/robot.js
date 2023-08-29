@@ -58,21 +58,29 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
             
             channel.onmessage = (event) => {
+                console.log("got message")
+
                 try {
                     const parsedData = JSON.parse(event.data); // Try parsing the incoming data as JSON
             
                     // Check if the parsed data has a throttle property
                     if (parsedData.hasOwnProperty('throttle')) {
+                        console.log("has throttle property")
+
                         // Update the throttle value displayed in the HTML element
                         document.getElementById('throttle-data').innerText = `Throttle: ${parsedData.throttle}`;
                     } else {
                         // Existing code for handling other types of messages
+                        console.log("message has no throttle property")
+
                         document.getElementById('messages').innerText += '\n' + event.data;
                         //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
                     }
             
                 } catch (e) {
                     // Incoming data wasn't JSON or an error occurred, handle as you normally would
+                    console.log(" message error")
+
                     document.getElementById('messages').innerText += '\n' + event.data;
                     //localSocket.emit('motor-command', event.data);  // Emit the data received to the local socket server
                 }

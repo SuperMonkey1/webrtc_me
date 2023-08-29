@@ -2,44 +2,10 @@ let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.co
 let pc;
 let channel;
 let remoteVideo = document.getElementById('remote-video');
-let hasController = false;
-let controller;
+let hasGamepad = false;
+let gamepad;
 let throttle = 0;
 
-// Function to check for controller inputs
-function getGamepadInput() {
-    let gamepads = navigator.getGamepads();
-
-    for(let i = 0; i < gamepads.length; i++) {
-        if(gamepads[i]) {
-            // A controller is connected, update the flag and the controller variable
-            hasGamepad = true;
-            gamepad = gamepads[i];
-            break;
-        }
-    }
-
-    // If a controller is connected, read its values
-    if (hasGamepad) {
-        // Reading one of the thumbsticks (for example, the left thumbstick's Y axis)
-        throttle = gamepad.axes[1];     // linker joystick op(-1) neer (1)
-        console.log('Throttle value:', throttle);
-
-        if(throttle !== lastSentThrottle) {
-            // If the data channel is open, send the throttle data
-            if(channel && channel.readyState === 'open') {
-                channel.send(JSON.stringify({ throttle: throttle }));
-            }
-
-            // Update the last sent throttle value
-            lastSentThrottle = throttle;
-        }
-    }
-
-    // Poll the controller again in the next frame
-    requestAnimationFrame(getGamepadInput);
-}
-getGamepadInput();
 
 // Fetch ICE servers
 fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')

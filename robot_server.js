@@ -23,6 +23,32 @@ io.on('connection', (socket) => {
     socket.on('motor-command', (command) => {
         console.log('Motor command:', command);
 
+        // Check if the received command is "motordata"
+        if (command === 'motordata') {
+            console.log('motor commands received');
+        }
+
+
+        // if (command === 'start') {
+        //     motor.writeSync(1);
+        // } else if (command === 'stop') {
+        //     motor.writeSync(0);
+        // }
+    });
+
+    socket.on('throttle', (throttleValue) => {
+        console.log('Throttle value received:', throttleValue);
+        // You can add more code here to handle the throttle value, e.g., control a motor
+    });
+
+    socket.on('motor-command', (command) => {
+        console.log('Motor command:', command);
+
+        // Check if the received command is "motordata"
+        if (command === 'motordata') {
+            console.log('motor commands received');
+        }
+        
         // if (command === 'start') {
         //     motor.writeSync(1);
         // } else if (command === 'stop') {

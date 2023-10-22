@@ -68,7 +68,7 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
 
                         // Update the throttle value displayed in the HTML element
                         document.getElementById('throttle-data').innerText = `Throttle: ${parsedData.throttle}`;
-                        localSocket.emit('throttle', parsedData.throttle);  // Emit the data received to the local socket server
+                        //localSocket.emit('throttle', parsedData.throttle);  // Emit the data received to the local socket server
                     } else {
                         // Existing code for handling other types of messages
                         console.log("message has no throttle property")

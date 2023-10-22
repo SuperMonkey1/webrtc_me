@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const cors = require('cors');  // Include cors package
+const { SerialPort } = require('serialport')
 
 // const Gpio = require('onoff').Gpio;
 // const motor = new Gpio(4, 'out');
@@ -17,43 +18,26 @@ const io = socketIO(server, {
     }
 });
 
+// Create an UART port
+const port = new SerialPort({
+    path: 'COM8',
+    baudRate: 9600,
+  })
+
+
 io.on('connection', (socket) => {
     console.log('User connected');
 
-    socket.on('motor-command', (command) => {
-        console.log('Motor command:', command);
-
-        // Check if the received command is "motordata"
-        if (command === 'motordata') {
-            console.log('motor commands received');
-        }
-
-
-        // if (command === 'start') {
-        //     motor.writeSync(1);
-        // } else if (command === 'stop') {
-        //     motor.writeSync(0);
-        // }
-    });
-
     socket.on('throttle', (throttleValue) => {
         console.log('Throttle value received:', throttleValue);
-        // You can add more code here to handle the throttle value, e.g., control a motor
-    });
-
-    socket.on('motor-command', (command) => {
-        console.log('Motor command:', command);
-
-        // Check if the received command is "motordata"
-        if (command === 'motordata') {
-            console.log('motor commands received');
-        }
+    
+        port.write(throttleValue + '\n', (err) => {
+            if (err) {
+                return console.log('Error on write: ', err.message);
+            }
+            console.log('Sent: ', throttleValue); // Log the sent message to the console
+        });
         
-        // if (command === 'start') {
-        //     motor.writeSync(1);
-        // } else if (command === 'stop') {
-        //     motor.writeSync(0);
-        // }
     });
 
     socket.on('disconnect', () => {

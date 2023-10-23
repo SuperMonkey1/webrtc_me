@@ -9,6 +9,7 @@ let controller;
 let throttle = 0;
 let steering = 0;
 let lastSentThrottle ;
+let lastSentSteering ;
 
 // Function to check for controller inputs
 function getGamepadInput() {
@@ -36,10 +37,20 @@ function getGamepadInput() {
                 channel.send(JSON.stringify({ throttle: throttle, steering: steering }));
             }
             document.getElementById("throttleValue").innerText = throttle;
-            document.getElementById("steeringValue").innerText = steering;
 
             // Update the last sent throttle value
             lastSentThrottle = throttle;
+        }
+
+        if(steering !== lastSentSteering) {
+            // If the data channel is open, send the throttle data
+            if(channel && channel.readyState === 'open') {
+                channel.send(JSON.stringify({ throttle: throttle, steering: steering }));
+            }
+            document.getElementById("steeringValue").innerText = steering;
+
+            // Update the last sent throttle value
+            lastSentSteering = steering;
         }
     }
 

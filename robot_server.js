@@ -25,19 +25,54 @@ const port = new SerialPort({
   })
 
 
+// io.on('connection', (socket) => {
+//     console.log('User connected');
+
+//     socket.on('throttle', (throttleValue) => {
+//         console.log('Throttle value received:', throttleValue);
+    
+//         port.write(throttleValue + '\n', (err) => {
+//             if (err) {
+//                 return console.log('Error on write: ', err.message);
+//             }
+//             console.log('Sent: ', throttleValue); // Log the sent message to the console
+//         });
+        
+//     });
+
+//     socket.on('disconnect', () => {
+//         console.log('User disconnected');
+//     });
+// });
+
+
 io.on('connection', (socket) => {
     console.log('User connected');
 
-    socket.on('throttle', (throttleValue) => {
-        console.log('Throttle value received:', throttleValue);
-    
-        port.write(throttleValue + '\n', (err) => {
-            if (err) {
-                return console.log('Error on write: ', err.message);
-            }
-            console.log('Sent: ', throttleValue); // Log the sent message to the console
-        });
+    socket.on('control_data', (data) => {
+        console.log('Control data received:', data);
+
+        let throttleValue = data.throttle;
+        let steeringValue = data.steering;
         
+        console.log('Throttle value:', throttleValue);
+        console.log('Steering value:', steeringValue);
+
+        // Sending throttle value
+        port.write(`throttle:${throttleValue}\n`, (err) => {
+            if (err) {
+                return console.log('Error on throttle write: ', err.message);
+            }
+            console.log('Throttle Sent: ', throttleValue); // Log the sent message to the console
+        });
+
+        // Sending steering value
+        port.write(`steering:${steeringValue}\n`, (err) => {
+            if (err) {
+                return console.log('Error on steering write: ', err.message);
+            }
+            console.log('Steering Sent: ', steeringValue); // Log the sent message to the console
+        });
     });
 
     socket.on('disconnect', () => {

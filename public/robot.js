@@ -63,12 +63,15 @@ fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
                     const parsedData = JSON.parse(event.data); // Try parsing the incoming data as JSON
             
                     // Check if the parsed data has a throttle property
-                    if (parsedData.hasOwnProperty('throttle')) {
+                    if (parsedData.hasOwnProperty('throttle') && parsedData.hasOwnProperty('steering') ) {
                         console.log("has throttle property")
 
                         // Update the throttle value displayed in the HTML element
                         document.getElementById('throttle-data').innerText = `Throttle: ${parsedData.throttle}`;
-                        localSocket.emit('throttle', parsedData.throttle);  // Emit the data received to the local socket server
+                        document.getElementById('steering-data').innerText = `Steering: ${parsedData.steering}`;
+                        //localSocket.emit('throttle', parsedData.throttle);  // Emit the data received to the local socket server
+                        localSocket.emit('control_data', { throttle: parsedData.throttle, steering: parsedData.steering }); 
+
                     } else {
                         // Existing code for handling other types of messages
                         console.log("message has no throttle property")

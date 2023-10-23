@@ -7,6 +7,7 @@ let gamepad;
 let hasGamepad = false;
 let controller;
 let throttle = 0;
+let steering = 0;
 let lastSentThrottle ;
 
 // Function to check for controller inputs
@@ -26,14 +27,16 @@ function getGamepadInput() {
     if (hasGamepad) {
         // Reading one of the thumbsticks (for example, the left thumbstick's Y axis)
         throttle = gamepad.axes[1];     // linker joystick op(-1) neer (1)
+        steering = gamepad.axes[2];
         console.log('Throttle value:', throttle);
 
         if(throttle !== lastSentThrottle) {
             // If the data channel is open, send the throttle data
             if(channel && channel.readyState === 'open') {
-                channel.send(JSON.stringify({ throttle: throttle }));
+                channel.send(JSON.stringify({ throttle: throttle, steering: steering }));
             }
             document.getElementById("throttleValue").innerText = throttle;
+            document.getElementById("steeringValue").innerText = steering;
 
             // Update the last sent throttle value
             lastSentThrottle = throttle;

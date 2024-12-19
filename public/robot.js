@@ -1,4 +1,5 @@
-let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+//let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+let socket = io.connect('https://roboroo-69b18e1c5d49.herokuapp.com');
 //let localSocket = io.connect('http://your-raspberry-pi-ip-address:8080'); // Connect to local Socket.io server
 let localSocket = io.connect('http://localhost:8080'); // Connect to local Socket.io server
 
@@ -7,7 +8,8 @@ let channel;
 let localVideo = document.getElementById('local-video');
 
 // Fetch ICE servers
-fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
+//fetch('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com/iceservers')
+fetch('https://roboroo-69b18e1c5d49.herokuapp.com/iceservers')
     .then(response => response.json())
     .then(data => {
         console.log("fetched ice servers")

@@ -1,4 +1,5 @@
-let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+//let socket = io.connect('https://desolate-depths-29424-e1ff0b4f81bf.herokuapp.com');
+let socket = io.connect('https://roboroo-69b18e1c5d49.herokuapp.com');
 let pc;
 let channel;
 let remoteVideo = document.getElementById('remote-video');

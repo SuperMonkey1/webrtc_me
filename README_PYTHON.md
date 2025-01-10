@@ -18,4 +18,21 @@ git push heroku master
 git push heroku start_stop:master
 heroku open
 
-# visiting heroku website: https://your-app-name.herokuapp.com/robot.html
+# visiting heroku website: https://roboroo-69b18e1c5d49.herokuapp.com
+
+
+
+
+
+# deploy: 
+heroku login
+git push heroku master
+(git push heroku start_stop:master)
+heroku open
+
+# Use
+controller: go to https://roboroo-69b18e1c5d49.herokuapp.com/controller.html
+robot: go to https://roboroo-69b18e1c5d49.herokuapp.com/robot.html
+
+# More Info
+go to blowholds chrome and Kermit in Projects folder

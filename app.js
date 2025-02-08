@@ -25,7 +25,7 @@ class App {
 
     setupRoutes() {
         this.app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/views/controller.html'));
+            res.sendFile(path.join(__dirname, 'public/controller.html'));
         });
 
         this.app.get('/iceservers', async (req, res) => {

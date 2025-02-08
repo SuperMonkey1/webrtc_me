@@ -12,22 +12,6 @@ let steering = 0;
 let lastSentThrottle ;
 let lastSentSteering ;
 
-const connectBtn = document.getElementById('connect');
-const disconnectBtn = document.getElementById('disconnect_me');
-
-function showConnectButton() {
-    connectBtn.classList.add('active');
-    disconnectBtn.classList.remove('active');
-}
-
-function showDisconnectButton() {
-    connectBtn.classList.remove('active');
-    disconnectBtn.classList.add('active');
-}
-
-// Call showConnectButton() initially
-showConnectButton();
-
 // Function to check for controller inputs
 function getGamepadInput() {
     let gamepads = navigator.getGamepads();
@@ -107,7 +91,7 @@ fetch('https://roboroo-69b18e1c5d49.herokuapp.com/iceservers')
         socket.emit('candidate', candidate);
     };
 
-    connectBtn.addEventListener('click', async () => {
+    document.getElementById('connect').addEventListener('click', async () => {
         console.log("on connect")
         // channel = pc.createDataChannel('chat');
         // channel.onmessage = (event) => {
@@ -119,10 +103,10 @@ fetch('https://roboroo-69b18e1c5d49.herokuapp.com/iceservers')
         // await pc.setLocalDescription(offer);
         // socket.emit('offer', offer);
         socket.emit('initiate_connection');
-        showDisconnectButton();
+
     });
 
-    disconnectBtn.addEventListener('click', () => {
+    document.getElementById('disconnect_me').addEventListener('click', () => {
         console.log("on disconnect")
     
         // Close the RTCPeerConnection
@@ -132,7 +116,6 @@ fetch('https://roboroo-69b18e1c5d49.herokuapp.com/iceservers')
     
         // Send a message to the server to inform the other end to also close the connection
         socket.emit('disconnect_me');
-        showConnectButton();
     });
 
     socket.on('offer', async (offer) => {

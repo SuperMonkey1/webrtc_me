@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebRTC Controller</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Version 1</h1>
+    <button id="connect">Connect</button>
+    <button id="disconnect_me">Disconnect</button>
+    <h1>Xbox Controller Input</h1>
+    <p>Current Throttle Value: <span id="throttleValue">0</span></p>
+    <p>Current Steering Value: <span id="steeringValue">0</span></p>
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="Enter your message here..." />
+        <button type="submit">Send</button>
+    </form>
+    <div id="messages"></div>
+    <video id="remote-video" autoplay playsinline></video>
+
+    <script src="controller.js"></script>
+</body>
+</html>

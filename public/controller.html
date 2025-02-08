@@ -3,20 +3,132 @@
 <head>
     <title>WebRTC Controller</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2vh;
+            background-color: #f5f5f5;
+            height: 96vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            text-align: left;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls button {
+            display: none;  /* Hide both buttons by default */
+        }
+
+        .controls button.active {
+            display: block;  /* Show button when it has 'active' class */
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        #connect {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #disconnect_me {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .controller-values {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        .controller-values h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .value-display {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio (9 / 16 = 0.5625) */
+            margin-bottom: 1.5vh;
+        }
+
+        #remote-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background-color: #000;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body>
-    <h1>Version 1</h1>
-    <button id="connect">Connect</button>
-    <button id="disconnect_me">Disconnect</button>
-    <h1>Xbox Controller Input</h1>
-    <p>Current Throttle Value: <span id="throttleValue">0</span></p>
-    <p>Current Steering Value: <span id="steeringValue">0</span></p>
-    <form id="message-form">
-        <input type="text" id="message-input" placeholder="Enter your message here..." />
-        <button type="submit">Send</button>
-    </form>
-    <div id="messages"></div>
-    <video id="remote-video" autoplay playsinline></video>
+    <div class="header">
+        <h1>K.E.R.M.I.T.</h1>
+        <div class="controls">
+            <button id="connect" class="active">Connect</button>
+            <button id="disconnect_me">Disconnect</button>
+        </div>
+    </div>
+    
+    <div class="video-container">
+        <video id="remote-video" autoplay playsinline></video>
+    </div>
+
+    <div class="controller-values">
+        <h2>Xbox Controller Input</h2>
+        <div class="value-display">
+            <span>Throttle Value:</span>
+            <span id="throttleValue">0</span>
+        </div>
+        <div class="value-display">
+            <span>Steering Value:</span>
+            <span id="steeringValue">0</span>
+        </div>
+    </div>
 
     <script src="controller.js"></script>
 </body>

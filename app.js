@@ -3,7 +3,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 const constants = require('./config/constants');
-const SocketService = require('./services/service');
+const SocketService = require('./services/socket');
 
 class App {
     constructor() {

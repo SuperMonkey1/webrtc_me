@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve "about.html" on root URL
 app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/controller.html'));
+  res.sendFile(path.join(__dirname + '/public/welcome.html'));
 });
 
 // app.get('/iceservers', async (req, res) => {

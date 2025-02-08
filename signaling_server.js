@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve welcome page on root URL
 app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/client.html'));
+  res.sendFile(path.join(__dirname + '/public/welcome.html'));
 });
 
 // ICE servers endpoint

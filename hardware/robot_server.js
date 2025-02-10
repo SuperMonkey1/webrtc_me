@@ -56,5 +56,3 @@ io.on('connection', (socket) => {
 });
 
 server.listen(8080, () => {console.log('Listening on port 8080');});
-
-//Hallo
